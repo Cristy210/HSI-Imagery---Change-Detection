@@ -5,7 +5,7 @@ Please add the following items:
 
 [Program link](https://github.com/mathworks/MATLAB-Simulink-Challenge-Project-Hub)
 
-[Project description link]<Add link to the project description from the list of projects above>
+[Project description link](https://github.com/mathworks/MATLAB-Simulink-Challenge-Project-Hub/tree/main/projects/Change%20Detection%20in%20Hyperspectral%20Imagery)
 
 
 # Project details
@@ -18,4 +18,6 @@ Please explain step by step how to run the code/model and include information ab
 Add a video or animated gif/picture to showcase the code in operation.
   
 # Reference
-Add reference papers, data, or supporting material that has been used, if any.
+R. C. Daudt, B. Le Saux, A. Boulch and Y. Gousseau, "Urban Change Detection for Multispectral Earth Observation Using Convolutional Neural Networks," IGARSS 2018 - 2018 IEEE International Geoscience and Remote Sensing Symposium, Valencia, Spain, 2018, pp. 2115-2118, doi: 10.1109/IGARSS.2018.8518015. keywords: {Satellites;Computer architecture;Image resolution;Training;Earth;Detection algorithms;Convolutional neural networks;Change detection;supervised machine learning;convolutional neural networks;multispectral earth observation},
+
+
