@@ -12,16 +12,55 @@ firstImage = imread(fullfile(folder, tifFiles(1).name));
 
 imageData = zeros(rows, cols, numFiles, 'like', firstImage);
 
+wavelengths = [443, 490, 560, 665, 705, 740, 783, 842, 865, 940, 1375, 1610, 2190];
+
+
+% Define the output file name
+outputFileName = fullfile(folder, 'combined_multipage_tiff_output.tif');
+
+% Create the Tiff object
+t = Tiff(outputFileName, 'w');
+
+% Define the tag structure for the TIFF file
+tagstruct.ImageLength = rows;
+tagstruct.ImageWidth = cols;
+tagstruct.Photometric = Tiff.Photometric.MinIsBlack;
+tagstruct.BitsPerSample = 16;
+tagstruct.SamplesPerPixel = 1;
+tagstruct.RowsPerStrip = 16;
+tagstruct.PlanarConfiguration = Tiff.PlanarConfiguration.Chunky;
+tagstruct.Software = 'MATLAB';
+
+% Write each image as a separate page
 for k = 1:numFiles
     baseFileName = tifFiles(k).name;
     fullFileName = fullfile(folder, baseFileName);
-    fprintf('Now reading %s\n', fullFileName);
+    fprintf('Now writing %s\n', fullFileName);
     
     % Read the image
     currentImage = imread(fullFileName);
     
-    % Store the image in the 3D array
-    imageData(:, :, k) = currentImage;
+    % Update dimensions in tag structure if necessary
+    [rows, cols] = size(currentImage);
+    tagstruct.ImageLength = rows;
+    tagstruct.ImageWidth = cols;
+    
+    % Set the tag values for each image
+    t.setTag(tagstruct);
+    
+    % Write the image data
+    t.write(currentImage);
+    
+    % Write a new directory for the next image
+    if k < numFiles
+        t.writeDirectory();
+    end
 end
 
-disp(size(imageData));
+% Close the Tiff object
+t.close();
+
+
+
+wavelengthFile = fullfile(folder, 'wavelengths.mat');
+save(wavelengthFile, 'wavelengths');
