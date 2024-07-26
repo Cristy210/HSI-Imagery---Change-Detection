@@ -5,62 +5,26 @@ filePattern = fullfile(folder, '*.tif');
 tifFiles = dir(filePattern);
 
 numFiles = length(tifFiles);
-imageData = []
 
-firstImage = imread(fullfile(folder, tifFiles(1).name));
-[rows, cols] = size(firstImage);
+tifFiles = tifFiles(arrayfun(@(x) endsWith(x.name, '.tif'), tifFiles));
 
-imageData = zeros(rows, cols, numFiles, 'like', firstImage);
+multiPageTiffFile = fullfile(folder, 'multipage.tif');
 
-wavelengths = [443, 490, 560, 665, 705, 740, 783, 842, 865, 940, 1375, 1610, 2190];
-
-
-% Define the output file name
-outputFileName = fullfile(folder, 'combined_multipage_tiff_output.tif');
-
-% Create the Tiff object
-t = Tiff(outputFileName, 'w');
-
-% Define the tag structure for the TIFF file
-tagstruct.ImageLength = rows;
-tagstruct.ImageWidth = cols;
-tagstruct.Photometric = Tiff.Photometric.MinIsBlack;
-tagstruct.BitsPerSample = 16;
-tagstruct.SamplesPerPixel = 1;
-tagstruct.RowsPerStrip = 16;
-tagstruct.PlanarConfiguration = Tiff.PlanarConfiguration.Chunky;
-tagstruct.Software = 'MATLAB';
-
-% Write each image as a separate page
-for k = 1:numFiles
-    baseFileName = tifFiles(k).name;
-    fullFileName = fullfile(folder, baseFileName);
-    fprintf('Now writing %s\n', fullFileName);
-    
+for k = 1:length(tifFiles)
     % Read the image
-    currentImage = imread(fullFileName);
-    
-    % Update dimensions in tag structure if necessary
-    [rows, cols] = size(currentImage);
-    tagstruct.ImageLength = rows;
-    tagstruct.ImageWidth = cols;
-    
-    % Set the tag values for each image
-    t.setTag(tagstruct);
-    
-    % Write the image data
-    t.write(currentImage);
-    
-    % Write a new directory for the next image
-    if k < numFiles
-        t.writeDirectory();
+    fileName = fullfile(folder, tifFiles(k).name);
+    img = imread(fileName);
+
+    % Write the image to a multi-page TIFF file
+    if k == 1
+        imwrite(img, multiPageTiffFile, 'WriteMode', 'overwrite', 'Compression', 'none');
+    else
+        imwrite(img, multiPageTiffFile, 'WriteMode', 'append', 'Compression', 'none');
     end
 end
 
-% Close the Tiff object
-t.close();
+wavelengths = [443, 490, 560, 665, 705, 740, 783, 842, 865, 940, 1375, 1610, 2190];
 
+wavelengthsFile = fullfile(folder, 'wavelengths.txt');
+writematrix(wavelengths', wavelengthsFile);
 
-
-wavelengthFile = fullfile(folder, 'wavelengths.mat');
-save(wavelengthFile, 'wavelengths');
